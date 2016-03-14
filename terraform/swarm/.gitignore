@@ -1,0 +1,8 @@
+*.tfstate
+*.backup
+
+files/ssl/*.pem
+files/ssl/*.csr
+files/ssl/*.srl
+
+templates/discovery_url
