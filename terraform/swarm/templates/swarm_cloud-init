@@ -36,8 +36,25 @@ coreos:
         TimeoutStartSec=20m
         ExecStartPre=/usr/bin/docker pull swarm:${swarm_version}
         ExecStartPre=-/usr/bin/docker rm -f swarm-manager
-        ExecStart=/bin/sh -c "/usr/bin/docker run --rm --name swarm-manager -v /etc/docker/ssl:/etc/docker/ssl --net=host swarm:${swarm_version} manage --tlsverify --tlscacert=/etc/docker/ssl/ca.pem --tlscert=/etc/docker/ssl/cert.pem --tlskey=/etc/docker/ssl/key.pem etcd://$COREOS_PRIVATE_IPV4:2379/docker"
+        ExecStart=/bin/sh -c "/usr/bin/docker run --rm --name swarm-manager -p 2375:2375 -v /etc/docker/ssl:/etc/docker/ssl --net=host swarm:${swarm_version} manage --tlsverify --tlscacert=/etc/docker/ssl/ca.pem --tlscert=/etc/docker/ssl/cert.pem --tlskey=/etc/docker/ssl/key.pem etcd://$COREOS_PRIVATE_IPV4:2379/docker"
         ExecStop=/usr/bin/docker stop swarm-manager
+    - name: registrator.service
+      command: start
+        Requires=docker.service
+        After=docker.service
+      content: |
+        [Unit]
+        Description=registrator
+        Requires=docker.service
+        After=docker.service
+
+        [Service]
+        EnvironmentFile=/etc/environment
+        TimeoutStartSec=20m
+        ExecStartPre=/usr/bin/docker pull gliderlabs/registrator:latest
+        ExecStartPre=-/usr/bin/docker rm -f registrator
+        ExecStart=/bin/sh -c "docker run -d --name=registrator --volume=/var/run/docker.sock:/tmp/docker.sock:ro gliderlabs/registrator:latest etcd://$COREOS_PRIVATE_IPV4:4001/registrator"
+        ExecStop=/usr/bin/docker rm -f registrator
   etcd2:
     discovery: ${discovery_url}
     advertise-client-urls: http://$private_ipv4:2379

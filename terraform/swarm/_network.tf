@@ -1,10 +1,10 @@
 resource "openstack_networking_network_v2" "atx2016" {
-  name = "network_${var.cluster_name}"
+  name = "network_${var.cluster_name}-atx2016"
   admin_state_up = "true"
 }
 
 resource "openstack_networking_subnet_v2" "atx2016" {
-  name = "subnet_${var.cluster_name}"
+  name = "subnet_${var.cluster_name}-atx2016"
   network_id = "${openstack_networking_network_v2.atx2016.id}"
   cidr = "192.168.199.0/24"
   ip_version = 4
@@ -12,7 +12,7 @@ resource "openstack_networking_subnet_v2" "atx2016" {
 
 resource "openstack_networking_router_v2" "atx2016" {
   region = "RegionOne"
-  name = "router_${var.cluster_name}"
+  name = "router_${var.cluster_name}--atx2016"
   external_gateway = "${var.external_gateway}"
 }
 

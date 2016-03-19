@@ -22,14 +22,12 @@ export TF_VAR_auth_url=${OS_AUTH_URL}
 export TF_VAR_whitelist_network=$(curl -s icanhazip.com)/32
 ```
 
-## Docker Swarm
+## Deploy Infrastructure
+
+This will create a 3 node Docker Swarm Cluster and a 3 node DEIS cluster
 
 ```
-cd terraform/swarm
-
+cd terraform
 terraform plan
-
 terraform apply
 ```
-
-## Deis
