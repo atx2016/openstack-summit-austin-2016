@@ -39,3 +39,8 @@ variable "whitelist_network" {
 variable "external_gateway" {
   description = "uuid of external network"
 }
+
+variable "network_cidr" {
+  description = "CIDR to use for neutron network"
+  default = "192.168.199.0/24"
+}

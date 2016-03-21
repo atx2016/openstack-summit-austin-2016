@@ -1,0 +1,38 @@
+Host *
+    ForwardAgent yes
+    TCPKeepAlive yes
+    ServerAliveInterval 300
+    User core
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+
+Host swarm-*
+    ProxyCommand ssh -W %h:%p core@169.45.125.44
+
+Host deis-*
+    ProxyCommand ssh -W %h:%p core@169.45.125.41
+
+Host swarm
+    Hostname 169.45.125.44
+
+Host deis
+    Hostname 169.45.125.41
+
+Host swarm-2
+    Hostname 192.168.199.6
+
+Host swarm-0
+    Hostname 192.168.199.4
+
+Host swarm-1
+    Hostname 192.168.199.5
+
+Host deis-0
+    Hostname 192.168.199.8
+
+Host deis-2
+    Hostname 192.168.199.7
+
+Host deis-1
+    Hostname 192.168.199.9
+

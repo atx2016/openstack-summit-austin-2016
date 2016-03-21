@@ -1,0 +1,19 @@
+Host *
+    ForwardAgent yes
+    TCPKeepAlive yes
+    ServerAliveInterval 300
+    User core
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+
+Host swarm-*
+    ProxyCommand ssh -W %h:%p core@${swarm_ip}
+
+Host deis-*
+    ProxyCommand ssh -W %h:%p core@${deis_ip}
+
+Host swarm
+    Hostname ${swarm_ip}
+
+Host deis
+    Hostname ${deis_ip}

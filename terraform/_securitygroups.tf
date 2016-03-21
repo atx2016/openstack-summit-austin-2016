@@ -22,9 +22,9 @@ resource "openstack_compute_secgroup_v2" "atx2016" {
   }
 }
 
-resource "openstack_compute_secgroup_v2" "atx2016_ingress" {
-  name = "${var.cluster_name}_atx2016_ingress"
-  description = "ingress ${var.cluster_name} - Austin 2016 Demo"
+resource "openstack_compute_secgroup_v2" "atx2016_swarm" {
+  name = "${var.cluster_name}_atx2016_swarm"
+  description = "${var.cluster_name} - Austin 2016 Demo"
   # SSH
   rule {
     ip_protocol = "tcp"
@@ -37,18 +37,6 @@ resource "openstack_compute_secgroup_v2" "atx2016_ingress" {
     ip_protocol = "tcp"
     from_port = "2375"
     to_port = "2375"
-    cidr = "${var.whitelist_network}"
-  }
-}
-
-resource "openstack_compute_secgroup_v2" "atx2016_swarm" {
-  name = "${var.cluster_name}_atx2016_swarm"
-  description = "${var.cluster_name} - Austin 2016 Demo"
-  # SSH
-  rule {
-    ip_protocol = "tcp"
-    from_port = "22"
-    to_port = "22"
     cidr = "${var.whitelist_network}"
   }
   # DANGER DANGER DANGER

@@ -6,7 +6,7 @@ resource "openstack_networking_network_v2" "atx2016" {
 resource "openstack_networking_subnet_v2" "atx2016" {
   name = "subnet_${var.cluster_name}-atx2016"
   network_id = "${openstack_networking_network_v2.atx2016.id}"
-  cidr = "192.168.199.0/24"
+  cidr = "${var.network_cidr}"
   ip_version = 4
 }
 

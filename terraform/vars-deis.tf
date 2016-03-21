@@ -14,3 +14,15 @@ variable "deis_keyname" {
 variable "deis_cluster_size" {
     default = 3
 }
+
+variable "install_deis" {
+  default = "false"
+}
+
+variable "deis_flavor" {
+    default = "m1.medium"
+}
+
+variable "deis_image_name" {
+    default = "CoreOS"
+}
