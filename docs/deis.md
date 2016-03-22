@@ -123,5 +123,4 @@ To ssh://git@deis.ip.of.deis.xip.io:2222/ironic-bagpiper.git
 $ curl http://ironic-bagpiper.ip.of.deis.xip.io
 Powered by Deis
 
-
 ```
