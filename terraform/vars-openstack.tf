@@ -44,3 +44,8 @@ variable "network_cidr" {
   description = "CIDR to use for neutron network"
   default = "192.168.199.0/24"
 }
+
+variable "enable_lbaas" {
+  description = "DO NOT USE THIS! does not auto-destroy GLHF"
+  default = 0
+}

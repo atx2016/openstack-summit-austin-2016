@@ -7,32 +7,29 @@ Host *
     UserKnownHostsFile /dev/null
 
 Host swarm-*
-    ProxyCommand ssh -W %h:%p core@169.45.125.44
+    ProxyCommand ssh -W %h:%p core@169.45.125.53
 
 Host deis-*
-    ProxyCommand ssh -W %h:%p core@169.45.125.41
+    ProxyCommand ssh -W %h:%p core@169.45.125.52
 
 Host swarm
-    Hostname 169.45.125.44
+    Hostname 169.45.125.53
 
 Host deis
-    Hostname 169.45.125.41
+    Hostname 169.45.125.52
 
 Host swarm-2
-    Hostname 192.168.199.6
+    Hostname 192.168.100.6
 
 Host swarm-0
-    Hostname 192.168.199.4
+    Hostname 192.168.100.5
 
 Host swarm-1
-    Hostname 192.168.199.5
+    Hostname 192.168.100.4
 
 Host deis-0
-    Hostname 192.168.199.8
-
-Host deis-2
-    Hostname 192.168.199.7
+    Hostname 192.168.100.9
 
 Host deis-1
-    Hostname 192.168.199.9
+    Hostname 192.168.100.8
 

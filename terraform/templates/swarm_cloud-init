@@ -58,6 +58,24 @@ coreos:
         ExecStartPre=-/usr/bin/docker rm -f registrator
         ExecStart=/usr/bin/docker run --net=host --restart=always --name=registrator --volume=/var/run/docker.sock:/tmp/docker.sock gliderlabs/registrator:latest -ip $private_ipv4 etcd://$private_ipv4:2379/registrator
         ExecStop=/usr/bin/docker rm -f registrator
+    - name: registry.service
+      enable: true
+      content: |
+        [Unit]
+        Description=docker registry
+        Requires=docker.service
+        After=docker.service
+
+        [Service]
+        EnvironmentFile=/etc/environment
+        TimeoutStartSec=20m
+        ExecStartPre=/usr/bin/docker pull registry:${docker_registry_version}
+        ExecStartPre=-/usr/bin/docker rm -f registry
+        ExecStart=/usr/bin/docker run --name registry -p 127.0.0.1:5000:5000 --restart always --env-file /etc/docker/registry.env registry:${docker_registry_version}
+        ExecStop=/usr/bin/docker rm -f registry
+
+
+
 
   etcd2:
     discovery: ${discovery_url}

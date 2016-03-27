@@ -18,6 +18,7 @@ resource "template_file" "swarm_cloud_init" {
         cluster_token = "${var.cluster_name}"
         discovery_url = "${template_file.swarm_discovery_url.rendered}"
         swarm_version = "${var.swarm_version}"
+        docker_registry_version = "${var.docker_registry_version}"
     }
 }
 
@@ -98,9 +99,14 @@ resource "null_resource" "install_swarm" {
             "sudo cp /tmp/files/ssl/ca.pem /etc/docker/ssl/",
             "sudo cp /tmp/files/ssl/cert.pem /etc/docker/ssl/",
             "sudo cp /tmp/files/ssl/key.pem /etc/docker/ssl/",
+            "echo '==> Docker Registry'",
+            "sudo mkdir -p /etc/docker",
+            "sudo su -c \"cat <<'EOF' > /etc/docker/registry.env\n${template_file.registry_vars.rendered}\nEOF\"",
             "echo '==> Services'",
             "echo '----> starting registrator'",
             "sudo systemctl start registrator.service",
+            "echo '----> starting docker registry'",
+            "sudo systemctl start registry.service",
             "echo '----> starting swarm-agent'",
             "sudo systemctl start swarm-agent.service",
             "echo '----> starting swarm-manager'",

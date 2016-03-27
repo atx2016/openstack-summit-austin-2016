@@ -35,3 +35,15 @@ resource "null_resource" "write_ssh_config" {
     }
     depends_on = ["template_file.ssh_config"]
 }
+
+resource "template_file" "registry_vars" {
+    template = "templates/registry_vars.env"
+    vars {
+        username = "${var.username}"
+        password = "${var.password}"
+        auth_url = "${var.auth_url}"
+        tenant = "${var.tenant}"
+        container = "${var.swift_container}"
+        secret = "${var.cluster_name}"
+    }
+}

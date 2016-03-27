@@ -81,3 +81,11 @@ ssh -F ssh_config deis
 ssh -F ssh_config swarm
 ```
 
+
+## Run Jenkins:
+
+```
+ssh -F ssh_config swarm
+
+docker run -d -p 8080:8080 jenkins
+```

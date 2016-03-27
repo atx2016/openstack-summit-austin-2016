@@ -100,8 +100,8 @@ resource "null_resource" "prepare_deis" {
 resource "null_resource" "install_deis" {
    provisioner "remote-exec" {
         inline = [
-            "/opt/bin/deisctl install platform",
-            "/opt/bin/deisctl start platform",
+            "echo /opt/bin/deisctl install platform",
+            "echo /opt/bin/deisctl start platform",
         ]
         connection {
             user = "core"
