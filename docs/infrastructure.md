@@ -80,12 +80,3 @@ The first server of each cluster will get a floating IP and be accessible via an
 ssh -F ssh_config deis
 ssh -F ssh_config swarm
 ```
-
-
-## Run Jenkins:
-
-```
-ssh -F ssh_config swarm
-
-docker run -d -p 8080:8080 jenkins
-```
