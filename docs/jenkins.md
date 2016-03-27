@@ -2,11 +2,13 @@
 
 ```
 ssh -F ssh_config swarm
-docker run -d --name jenkins -p 8080:8080 jenkins
+
+docker pull 127.0.0.1:5000/jenkins-demo
+
+docker run -d --name jenkins -p 8080:8080 127.0.0.1:5000/jenkins-demo
 docker exec -ti jenkins bash
-mkdir extras
-curl -sSL http://deis.io/deis-cli/install.sh | sh
-./deis login http://deis.xxxxxxxx
 ```
+
+
 
 
