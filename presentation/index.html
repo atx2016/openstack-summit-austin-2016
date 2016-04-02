@@ -53,20 +53,23 @@
 				<section>
 				  <h2>Dockerfile</h2>
 					<pre class="stretch"><code data-trim>
-# Base docker image
-FROM paulczar/chrome
+FROM alpine:3.3
 
-RUN apt-get install -y pepperflashplugin-nonfree \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add -U \
+	bash \
+	nginx \
+	&& rm -rf /var/cache/apk*
 
-COPY local.conf /etc/fonts/local.conf
+# forward request and error logs to docker log collector
+RUN ln -sf /dev/stdout /var/log/nginx/access.log
+RUN ln -sf /dev/stderr /var/log/nginx/error.log
 
+ADD /rootfs /
+ADD /presentation /usr/share/nginx/html
 
-COPY . /slides
+CMD ["/bin/boot"]
+EXPOSE 80
 
-# Autorun chrome
-ENTRYPOINT [ "/usr/bin/google-chrome-stable" ]
-CMD [ "--user-data-dir=/data", "--no-sandbox", "file:///slides/index.html" ]
 					</code></pre>
           <aside class="notes">
           * This is a dockerfile.<br>

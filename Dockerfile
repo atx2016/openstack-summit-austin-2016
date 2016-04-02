@@ -9,10 +9,8 @@ RUN apk add -U \
 RUN ln -sf /dev/stdout /var/log/nginx/access.log
 RUN ln -sf /dev/stderr /var/log/nginx/error.log
 
-ENV POWERED_BY Deis
-
-COPY /rootfs /
-COPY /presentation /usr/share/nginx/html
+ADD /rootfs /
+ADD /presentation /usr/share/nginx/html
 
 CMD ["/bin/boot"]
 EXPOSE 80
