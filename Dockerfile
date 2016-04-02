@@ -1,18 +1,9 @@
-FROM alpine:3.3
+FROM jumanjiman/caddy
 
-RUN apk add -U \
-	bash \
-	nginx \
-	&& rm -rf /var/cache/apk*
+ADD . /demo
 
-# forward request and error logs to docker log collector
-RUN ln -sf /dev/stdout /var/log/nginx/access.log
-RUN ln -sf /dev/stderr /var/log/nginx/error.log
+WORKDIR /demo/presentation
 
-ENV POWERED_BY Deis
+ENTRYPOINT ["/usr/sbin/caddy", "-conf", "/demo/presentation/caddyfile", "-root", "/demo/presentation"]
 
-COPY /rootfs /
-COPY /presentation /usr/share/nginx/html
-
-CMD ["/bin/boot"]
-EXPOSE 80
+EXPOSE 8080

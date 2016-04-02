@@ -1,0 +1,8 @@
+:8080
+
+ext .html   # Clean URLs
+
+#log /dev/stdout
+#errors /dev/stdout
+
+tls off
