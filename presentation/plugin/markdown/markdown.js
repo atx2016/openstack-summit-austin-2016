@@ -26,12 +26,10 @@
 		});
 	}
 
-	var DEFAULT_SLIDE_SEPARATOR = '^\r?\n---\r?\n$',
+	var DEFAULT_SLIDE_SEPARATOR = '^\n---\n$',
 		DEFAULT_NOTES_SEPARATOR = 'note:',
 		DEFAULT_ELEMENT_ATTRIBUTES_SEPARATOR = '\\\.element\\\s*?(.+?)$',
 		DEFAULT_SLIDE_ATTRIBUTES_SEPARATOR = '\\\.slide:\\\s*?(\\\S.+?)$';
-
-	var SCRIPT_END_PLACEHOLDER = '__SCRIPT_END__';
 
 
 	/**
@@ -45,9 +43,6 @@
 		// strip leading whitespace so it isn't evaluated as code
 		var text = ( template || section ).textContent;
 
-		// restore script end tags
-		text = text.replace( new RegExp( SCRIPT_END_PLACEHOLDER, 'g' ), '</script>' );
-
 		var leadingWs = text.match( /^\n?(\s*)/ )[1].length,
 			leadingTabs = text.match( /^\n?(\t*)/ )[1].length;
 
@@ -55,7 +50,7 @@
 			text = text.replace( new RegExp('\\n?\\t{' + leadingTabs + '}','g'), '\n' );
 		}
 		else if( leadingWs > 1 ) {
-			text = text.replace( new RegExp('\\n? {' + leadingWs + '}', 'g'), '\n' );
+			text = text.replace( new RegExp('\\n? {' + leadingWs + '}'), '\n' );
 		}
 
 		return text;
@@ -81,7 +76,7 @@
 			if( /data\-(markdown|separator|vertical|notes)/gi.test( name ) ) continue;
 
 			if( value ) {
-				result.push( name + '="' + value + '"' );
+				result.push( name + '=' + value );
 			}
 			else {
 				result.push( name );
@@ -119,10 +114,6 @@
 		if( notesMatch.length === 2 ) {
 			content = notesMatch[0] + '<aside class="notes" data-markdown>' + notesMatch[1].trim() + '</aside>';
 		}
-
-		// prevent script end tags in the content from interfering
-		// with parsing
-		content = content.replace( /<\/script>/g, SCRIPT_END_PLACEHOLDER );
 
 		return '<script type="text/template">' + content + '</script>';
 
