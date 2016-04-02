@@ -4,6 +4,6 @@ ADD . /demo
 
 WORKDIR /demo/presentation
 
-CMD ["-conf", "/demo/presentation/caddyfile", "-root", "/demo/presentation"]
+ENTRYPOINT ["/usr/sbin/caddy", "-conf", "/demo/presentation/caddyfile", "-root", "/demo/presentation"]
 
 EXPOSE 8080
