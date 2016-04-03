@@ -42,40 +42,124 @@
 			<div class="slides">
 				<section data-background="images/title_page.png">
 					<h2>PAAS!</h2>
+
+					<p>https://github.com/atx2016/openstack-summit-austin-2016
 					<aside class="notes">
 					</aside>
+          <aside class="notes">
+          <p>Ask somebody to go here and make a PR to add their name to the first slide!
+          </aside>
 				</section>
 
 				<section data-background="images/slide_bg.png">
-					<p>words words words</p>
+					<h2>About us....</h2>
 				</section>
+
+				<section data-background="images/slide_bg.png">
+					<h2>Let's talk Infrastructure</h2>
+					<ul>
+						<li>OpenStack ( BlueBox Cloud )
+						<li>Terraform
+						<li>DEIS
+						<li>Docker Swarm
+						<li>Docker Registry
+						<li>Jenkins
+					</ul>
+				</section>
+
+				<section data-background="images/slide_bg.png">
+					<h2>Infrastructure - OpenStack</h2>
+					<ul>
+						<li>Kilo
+						<li>Nova, Neutron, Cinder (Ceph), Swift, Heat, LBaaSv2
+						<li>BlueBox Cloud - Ursula!  opensource.
+					</ul>
+				</section>
+
+				<section data-background="images/slide_bg.png">
+					<h2>Infrastructure - Terraform</h2>
+					<p>About terraform
+					<p>Why not Heat?
+					<p>Is it ready for prime time ?
+				</section>
+
+				<section data-background="images/slide_bg.png">
+					<h2>Infrastructure - DEIS</h2>
+					<p>Docker based PAAS
+					<p>think "Heroku" behind the firewall
+					<p>Focus on UX
+					<p>v1 on CoreOS+Fleet,  v2 on K8s
+				</section>
+
+				<section data-background="images/slide_bg.png">
+					<h2>Infrastructure - Docker Swarm</h2>
+					<p>Simple multi-server docker container orchestration
+					<p>TLS/certs for security / authorization
+					<p>For running things that don't run well in PAAS.
+					<p>Why not K8s ?
+				</section>
+
+				<section data-background="images/slide_bg.png">
+					<h2>Infrastructure - Docker Registry</h2>
+					<p>Running on Swarm
+					<p>Backed by swift
+					<p>custom jenkins and other images saved here.
+				</section>
+
+				<section data-background="images/slide_bg.png">
+					<h2>Infrastructure - Jenkins</h2>
+					<p>for CI/CD pipeline
+					<p>from official Jenkins docker image
+					<p>modified for plugins and binaries and saved with `docker commit`
+				</section>
+
+				<section data-background="images/slide_bg.png">
+					<h2>CI/CD of an application</h2>
+					<ul>
+						<li>What app ?
+						<li>Dev Workflow
+					</ul>
+				</section>
+
 
 				<section>
 				  <h2>Dockerfile</h2>
 					<pre class="stretch"><code data-trim>
-FROM alpine:3.3
+FROM jumanjiman/caddy
 
-RUN apk add -U \
-	bash \
-	nginx \
-	&& rm -rf /var/cache/apk*
+ADD . /demo
 
-# forward request and error logs to docker log collector
-RUN ln -sf /dev/stdout /var/log/nginx/access.log
-RUN ln -sf /dev/stderr /var/log/nginx/error.log
+WORKDIR /demo/presentation
 
-ADD /rootfs /
-ADD /presentation /usr/share/nginx/html
+ENTRYPOINT ["/usr/sbin/caddy", "-conf", "/demo/presentation/caddyfile", "-root", "/demo/presentation"]
 
-CMD ["/bin/boot"]
-EXPOSE 80
-
+EXPOSE 8080
 					</code></pre>
           <aside class="notes">
           * This is a dockerfile.<br>
           * instructions on how to create an docker image<br>
           * FROM, RUN, COPY, CMD
           </aside>
+				</section>
+
+				<section data-background="images/slide_bg.png">
+					<h2>Dev Workflow</h2>
+					<ul>
+						<li>docker-compose locally
+						<li>FORK -> PR -> http://pr-X.atx2016.paulcz.net
+						<li>merge to develop, pushes to staging
+						<li>merge to master, puashes to production
+					</ul>
+				</section>
+
+				<section data-background="images/slide_bg.png">
+				<h2>DEMO!!!!</h2>
+				<ul>
+				  <li>terraform apply
+				  <li>show terraform for swarm
+				  <li>Accept PR for testing, show jenkins creating dev env
+				  <li>Merge to Deveop, show jenkins delete dev, upgrade stage
+				  <li>Merge to Prod, show jenkins upgratde prod
 				</section>
 
 				<section data-background="images/slide_bg.png">
