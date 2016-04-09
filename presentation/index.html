@@ -4,9 +4,9 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>Just Enough Openstack by Rags for Docker</title>
+		<title>A PaaS for Continuous Delivery of Cloud Native Apps</title>
 
-		<meta name="description" content="Just Enough Openstack for Docker">
+		<meta name="description" content="A PaaS for Continuous Delivery of Cloud Native Apps">
 		<meta name="author" content="Paul Czarkowski">
 
 		<meta name="apple-mobile-web-app-capable" content="yes" />
@@ -41,7 +41,8 @@
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
 				<section data-background="images/title_page.png">
-					<h2>A PaaS for Continuous Delivery of Cloud Native Apps</h2>
+				  <br><br><bR>
+					<h2>A PaaS for <br>Continuous Delivery<bR> of <br> Cloud Native <br>Apps</h2>
 					<p><small>https://github.com/atx2016/openstack-summit-austin-2016</small>
           <aside class="notes">
           <p>Ask somebody to go here and make a PR to add their name to the first slide!
@@ -50,6 +51,8 @@
 
 				<section data-background="images/slide_bg.png">
 					<h2>About us....</h2>
+					<h3>Paul Czarkowski <a href="http://twitter.com/pczarkowski/">@pczarkowski</a></h3>
+					<h3>Rags</h3>
 				</section>
 
 				<section data-background="images/slide_bg.png">
@@ -76,9 +79,9 @@
           </aside>
 				</section>
 
-				<section data-background="images/slide_bg.png">
-					<h2>Tech Stack</h2>
-					INSERT ARCHITECTURE DIAGRAM HERE
+				<section>
+					<img src="images/atx2016-arch.png">
+					<h2>Architecture</h2>
           <aside class="notes">
           </aside>
 				</section>
@@ -112,10 +115,8 @@
 
 				<section data-background="images/slide_bg.png">
 					<h2>DEIS</h2>
-					<p>Docker based PAAS
-					<p>think "Heroku" behind the firewall
-					<p>Focus on UX
-					<p>v1 on CoreOS+Fleet,  v2 on K8s
+					<img src="images/deis-logo.png">
+					<a href="http://deis.io/overview/">http://deis.io/overview/</a>
           <aside class="notes">
           <p>I've worked with DEIS for quite some time and it's UX and Herokuesque workflow made it a no brainer.
           <p>Heavy focus on stateless applications using external services (trove,RDS,etc) for data persistence.
@@ -125,12 +126,17 @@
           </aside>
 				</section>
 
+				<section>
+					<img src="images/deis-diagram.png">
+					<a href="http://docs.deis.io/en/latest/understanding_deis/architecture/">http://docs.deis.io/en/latest/understanding_deis/architecture/</a>
+          <aside class="notes">
+          </aside>
+				</section>
+
 				<section data-background="images/slide_bg.png">
-					<h2>Docker Swarm</h2>
-					<p>Simple multi-server docker container orchestration
-					<p>TLS/certs for security / authorization
-					<p>For running things that don't run well in PAAS.
-					<p>Why not K8s ?
+				  <h2>Docker Swarm</h2>
+				  <img src="images/docker-swarm.gif" height="30%" width="30%">
+					<br><a href="https://docs.docker.com/swarm/overview/">https://docs.docker.com/swarm/overview/</a>
           <aside class="notes">
           <p>We knew some stuff wouldn't run well in PAAS due to state
           <p>Swarm is easy to set up and run using Terraform
@@ -141,10 +147,14 @@
 				</section>
 
 				<section data-background="images/slide_bg.png">
-					<h2>Docker Registry</h2>
-					<p>Running on Swarm
-					<p>Backed by swift
-					<p>custom jenkins and other images saved here.
+				<h2>Docker Swarm</h2>
+				<img src="images/dockerswarm-arch.png">
+				</section>
+
+				<section data-background="images/slide_bg.png">
+				  <h2>Docker Registry</h2>
+				  <img src="images/docker-registry.png"><br>
+				  <a href="https://docs.docker.com/registry/">https://docs.docker.com/registry/</a>
           <aside class="notes">
           <p>We run registry on each swarm node, only listens on localhost
           <p>Backed by swift so our images persists and is available to all.
@@ -154,9 +164,9 @@
 
 				<section data-background="images/slide_bg.png">
 					<h2>Jenkins</h2>
-					<p>for CI/CD pipeline
-					<p>from official Jenkins docker image
-					<p>modified for plugins and binaries and saved with `docker commit`
+					<img src="images/jenkins.png">
+					<br><a href="https://jenkins.io/">https://jenkins.io/</a>
+
           <aside class="notes">
           <p>Didn't want to use jenkins, but only CI tool we could find that could do action on PR close.
           <p>Used official jenkins image, added deis binaries and keys and stuff, saved off with docker commit.
@@ -217,6 +227,19 @@ EXPOSE 8080
 				  <li>Merge to Prod, show jenkins upgratde prod
           <aside class="notes">
           </aside>
+				</section>
+
+				<section data-background="images/slide_bg.png">
+				<h2>Links</h2>
+				<ul>
+				<li><a href="http://sysadvent.blogspot.com/2015/12/day-16-merry-paasmas-and-very.html">Original Blog Post</a>
+				<li><a href="https://github.com/openstack/osops-tools-contrib/tree/master/terraform/">Openstack Ops terraform templates</a>
+				<li><a href="https://github.com/atx2016/openstack-summit-austin-2016">This Presentation (and code for demo)</a>
+				</ul>
+        <aside class="notes">
+        <p>orig article on sysadvent, ghost blog with database.
+        <p>Terraform for swarm,registry,deis,others
+        </aside>
 				</section>
 
 				<section data-background="images/slide_bg.png">
