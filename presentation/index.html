@@ -51,8 +51,24 @@
 
 				<section data-background="images/slide_bg.png">
 					<h2>About us....</h2>
-					<h3>Paul Czarkowski <a href="http://twitter.com/pczarkowski/">@pczarkowski</a></h3>
-					<h3>Rags</h3>
+						<table>
+						   <tr>
+							<td align="center">
+							Paul Czarkowski <a href="http://twitter.com/pczarkowski/">@pczarkowski</a>
+							</td>
+							<td align="center">
+							<img src="images/paul.jpg" />
+							</td>
+							</tr>
+							<tr>
+							<td align="center">
+							Rags Srinivas <a href="http://twitter.com/ragss/">@ragss</a>
+							</td>
+							<td align="center">
+							<img src="images/rags.jpg" />
+							</td>
+							</tr>
+						</table>
 				</section>
 
 				<section data-background="images/slide_bg.png">
@@ -179,12 +195,23 @@
 					<ul>
 						<li>What app ?
 						<li>Dev Workflow  -  FLOWCHART??!?!?!?!
+						<li>Immutable Infrastructure
 					</ul>
           <aside class="notes">
           </aside>
 				</section>
+				<section data-background="images/slide_bg.png">
+					<h2>Immutable Infrastrucure</h2>
 
-
+					<img src="images/immutable.jpg" />
+					<p>Image Courtesy: InfoQ</p>
+					<ul>
+						<li>Move configuration from build time to run time.
+					</ul>
+				</section>
+          <aside class="notes">
+          Keep runtime configuration to minimum and do most of the configuration at build time.
+          </aside>
 				<section>
 				  <h2>Dockerfile</h2>
 					<pre class="stretch"><code data-trim>
@@ -223,8 +250,8 @@ EXPOSE 8080
 				  <li>terraform apply
 				  <li>show terraform for swarm
 				  <li>Accept PR for testing, show jenkins creating dev env
-				  <li>Merge to Deveop, show jenkins delete dev, upgrade stage
-				  <li>Merge to Prod, show jenkins upgratde prod
+				  <li>Merge to Develop, show jenkins delete dev, upgrade stage
+				  <li>Merge to Prod, show jenkins upgrade prod
           <aside class="notes">
           </aside>
 				</section>
