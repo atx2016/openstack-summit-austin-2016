@@ -12,7 +12,7 @@ resource "openstack_networking_subnet_v2" "atx2016" {
 
 resource "openstack_networking_router_v2" "atx2016" {
   region = "RegionOne"
-  name = "router_${var.cluster_name}--atx2016"
+  name = "router_${var.cluster_name}-atx2016"
   external_gateway = "${var.external_gateway}"
 }
 
