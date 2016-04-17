@@ -1,6 +1,12 @@
 resource "openstack_compute_secgroup_v2" "atx2016" {
   name = "${var.cluster_name}_atx2016"
   description = "${var.cluster_name} - Austin 2016 Demo"
+  rule {
+    ip_protocol = "icmp"
+    from_port = "-1"
+    to_port = "-1"
+    cidr = "${var.whitelist_network}"
+  }
   # INTERNAL Communication only
   rule {
     ip_protocol = "icmp"
