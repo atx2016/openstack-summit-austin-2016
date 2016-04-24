@@ -45,7 +45,9 @@
 					<h2>A PaaS for <br>Continuous Delivery<bR> of <br> Cloud Native <br>Apps</h2>
 					<p><small>https://github.com/atx2016/openstack-summit-austin-2016</small>
           <aside class="notes">
-          <p>Ask somebody to go here and make a PR to add their name to the first slide!
+          <p>Based on a blog post Paul did for sysadvent
+          <p>want to demonstrate a full CI/CD pipeline using openstack and its ecosystem
+          <p>and the things you can do when you layer services on top of eachother.
           </aside>
 				</section>
 
@@ -72,23 +74,15 @@
 				</section>
 
 				<section data-background="images/slide_bg.png">
-					<h2>This Talk</h2>
-          <aside class="notes">
-          <p>Based on a blog post Paul did for sysadvent
-          <p>want to demonstrate a full CI/CD pipeline using openstack and its ecosystem
-          <p>and the things you can do when you layer services on top of eachother.
-          </aside>
-				</section>
-
-				<section data-background="images/slide_bg.png">
 					<h2>Tech Stack</h2>
 					<ul>
-						<li>OpenStack ( BlueBox Cloud )
-						<li>Terraform
-						<li>DEIS
-						<li>Docker Swarm
-						<li>Jenkins
-						<li>Docker Registry
+						<li>OpenStack ( BlueBox Cloud ) - <b>IaaS</b>
+						<li>Terraform - <b>Orchestration</b>
+						<li>DEIS - <b>PaaS</b>
+						<li>Docker Swarm - <b>Adhoc Container Scheduling</b>
+						<li>Jenkins - <b>CI/CD tasks / webhooks</b>
+						<li>Docker Registry - <b>Docker Image Storage</b>
+            <li>Github <b>(external service - source control)</b>
 					</ul>
           <aside class="notes">
           <p>This is the technology stack we used to build this demo.
@@ -104,10 +98,15 @@
 
 				<section data-background="images/slide_bg.png">
 					<h2>OpenStack</h2>
+          <p>BlueBox Cloud - Private Cloud as a Service
 					<ul>
-						<li>Kilo
-						<li>Nova, Neutron, Cinder (Ceph), Swift, Heat, LBaaSv2
-						<li>BlueBox Cloud - Ursula!  opensource.
+            <li>Keystone
+						<li>Nova
+            <li>Neutron
+            <li>Cinder (Ceph)
+            <li>Swift
+            <li>Heat
+            <li>LBaaSv2
 					</ul>
           <aside class="notes">
           <p>To ensure we had a good dynamic base we started with OpenStack
@@ -125,13 +124,44 @@
             <p>We needed to able to build/destroy our environments at will
             <p>chose to use terraform as it is easier to GROK than heat
             <p>We /could/ have done this with heat.
-            <p>Perfect for dev/test stuff don't care about.  Probably neither it or you are mature enough for prod.
+            <p>Perfect for dev/test stuff don't care about.  Probably neither if or you are mature enough for prod.
           </aside>
 				</section>
 
         <section>
+          <h2>Terraform</h2>
+          <pre class="stretch"><code data-trim>
+resource "openstack_compute_instance_v2" "atx2016_swarm_primary" {
+    name = "swarm-${var.cluster_name}-0"
+    image_name = "${var.image_name}"
+    flavor_name = "${var.flavor}"
+    key_pair = "${openstack_compute_keypair_v2.atx2016.name}"
+    network {
+        name = "${openstack_networking_network_v2.atx2016.name}"
+    }
+    security_groups = [
+        "${openstack_compute_secgroup_v2.atx2016_swarm.name}",
+        "${openstack_compute_secgroup_v2.atx2016.name}"
+    ]
+    floating_ip = "${openstack_networking_floatingip_v2.atx2016_swarm.address}"
+    user_data = "${template_file.swarm_cloud_init.rendered}"
+    depends_on = [
+        "template_file.swarm_cloud_init",
+        "null_resource.write_ssh_config",
+        "openstack_networking_router_interface_v2.atx2016"
+    ]
+}
+          </code></pre>
+          <aside class="notes">
+          * Example terraform resource.<br>
+          * describes swarm compute instance refers back to
+            network, secgroups, and other resources.
+          </aside>
+        </section>
+
+        <section>
           <h2>Terraform Demo</h2>
-          <video autoplay="true" controls="true">
+          <video autoplay="false" controls="true">
             <source data-src="videos/terraform_swarm.mp4" type="video/mp4" />
           </video>
         </section>
@@ -143,9 +173,6 @@
           <aside class="notes">
           <p>I've worked with DEIS for quite some time and it's UX and Herokuesque workflow made it a no brainer.
           <p>Heavy focus on stateless applications using external services (trove,RDS,etc) for data persistence.
-          <p>It is Docker based, currently runs on top of CoreOS+Fleet
-          <p>Moving to run on top of k8s in next major version.
-          <p>Relatively easy and quick to install and use, very easy to automate with Terraform.
           </aside>
 				</section>
 
@@ -153,14 +180,24 @@
 					<img src="images/deis-diagram.png">
 					<a href="http://docs.deis.io/en/latest/understanding_deis/architecture/">http://docs.deis.io/en/latest/understanding_deis/architecture/</a>
           <aside class="notes">
+          <p>It is Docker based, currently runs on top of CoreOS+Fleet
+          <p>Moving to run on top of k8s in next major version.
+          <p>Relatively easy and quick to install and use, very easy to automate with Terraform.
+          <p>in prod you would run a postgres and ceph/s3
           </aside>
 				</section>
 
         <section>
           <h2>DEIS Demo</h2>
-          <video autoplay="true" controls="true">
+          <video autoplay="false" controls="true">
             <source data-src="videos/deis_demo.mp4" type="video/mp4" />
           </video>
+          <aside class="notes">
+          <p>deis create; curl
+          <p>deis config:set POWERED_BY=openstack; curl
+          <p>deis rollback; curl
+          <p>deis logs
+          <p>
         </section>
 
 				<section data-background="images/slide_bg.png">
@@ -204,39 +241,22 @@
           </aside>
 				</section>
 
-				<section data-background="images/slide_bg.png">
-					<h2>CI/CD of an application</h2>
-					<ul>
-						<li>What app ?
-						<li>Dev Workflow  -  FLOWCHART??!?!?!?!
-						<li>Immutable Infrastructure
-					</ul>
+				<section>
+        <p>Development Workflow
+        <img class="stretch" src="images/Workflow.png">
           <aside class="notes">
+          <p>Dev writes code in feature branch, pushs to branch, creates PR
+          <p>GH notifies jenkins, runs tests, deploys PR specific dev environment
+          <p>Reviewer reviews and merges PR to Develop branch, GH notifies J
+          <p>Jenkins destroys dev environment, deploys changes to staging
+          <p>Release manager reviews and merges Develop to Master, GH notifies J
+          <p>Jenkins deploys changes to production
           </aside>
 				</section>
 
         <section>
-          <h2>Workflow Demo</h2>
-          <video autoplay="true" controls="true">
-            <source data-src="videos/atx2016_workflow-demo.mp4" type="video/mp4" />
-          </video>
-        </section>
-
-				<section data-background="images/slide_bg.png">
-					<h2>Immutable Infrastrucure</h2>
-
-					<img src="images/immutable.jpg" />
-					<p>Image Courtesy: InfoQ</p>
-					<ul>
-						<li>Move configuration from build time to run time.
-					</ul>
-				</section>
-          <aside class="notes">
-          Keep runtime configuration to minimum and do most of the configuration at build time.
-          </aside>
-				<section>
-				  <h2>Dockerfile</h2>
-					<pre class="stretch"><code data-trim>
+          <h2>Our Application</h2>
+          <pre class="stretch"><code data-trim>
 FROM jumanjiman/caddy
 
 ADD . /demo
@@ -246,37 +266,21 @@ WORKDIR /demo/presentation
 ENTRYPOINT ["/usr/sbin/caddy", "-conf", "/demo/presentation/caddyfile", "-root", "/demo/presentation"]
 
 EXPOSE 8080
-					</code></pre>
+          </code></pre>
           <aside class="notes">
-          * This is a dockerfile.<br>
-          * instructions on how to create an docker image<br>
-          * FROM, RUN, COPY, CMD
+          <p>eating our own dogfood.  developed this pres using this workflow
+          <p>presentation is simple HTML using reveal.js
+          <p>uses caddy a simple GO based web server to serve presentation
+          <p>jenkins tests are a noop due to simple nature of html, should be lint/unit tests
           </aside>
-				</section>
+        </section>
 
-				<section data-background="images/slide_bg.png">
-					<h2>Dev Workflow</h2>
-					<ul>
-						<li>docker-compose locally
-						<li>FORK -> PR -> http://pr-X.atx2016.paulcz.net
-						<li>merge to develop, pushes to staging
-						<li>merge to master, puashes to production
-					</ul>
-          <aside class="notes">
-          </aside>
-				</section>
-
-				<section data-background="images/slide_bg.png">
-				<h2>DEMO!!!!</h2>
-				<ul>
-				  <li>terraform apply
-				  <li>show terraform for swarm
-				  <li>Accept PR for testing, show jenkins creating dev env
-				  <li>Merge to Develop, show jenkins delete dev, upgrade stage
-				  <li>Merge to Prod, show jenkins upgrade prod
-          <aside class="notes">
-          </aside>
-				</section>
+        <section>
+          <h2>Workflow Demo</h2>
+          <video autoplay="false" controls="true">
+            <source data-src="videos/atx2016_workflow-demo.mp4" type="video/mp4" />
+          </video>
+        </section>
 
 				<section data-background="images/slide_bg.png">
 				<h2>Links</h2>
