@@ -1,8 +1,8 @@
-# Openstack Summit Austin 2016
+# OpenStack Summit Austin 2016
 
 
 
-staging area for presentation
+Staging area for presentation.
 
 
 ## Stand Up Demo Environment
