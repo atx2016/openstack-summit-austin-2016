@@ -45,10 +45,17 @@
 					<h2>A PaaS for <br>Continuous Delivery<bR> of <br> Cloud Native <br>Apps</h2>
 					<p><small>https://github.com/atx2016/openstack-summit-austin-2016</small>
           <aside class="notes">
-          <p>Based on a blog post Paul did for sysadvent
-          <p>want to demonstrate a full CI/CD pipeline using openstack and its ecosystem
-          <p>and the things you can do when you layer services on top of eachother.
+          <p> * Based on a blog post Paul did for sysadvent.
+          <p> * Mainly demo. driven.
+          <p> * Full CI/CD pipeline using openstack and its ecosystem
+          <p> * Layered and immutable infrastructure
           </aside>
+				</section>
+
+<section data-background="images/slide_bg.png">
+					<h2>Submit a PR at</h2>
+
+<a href="http://ibm.biz/atx-apr-2016">http://ibm.biz/atx-apr-2016</a>
 				</section>
 
 				<section data-background="images/slide_bg.png">
@@ -85,7 +92,10 @@
             <li>Github <b>(external service - source control)</b>
 					</ul>
           <aside class="notes">
-          <p>This is the technology stack we used to build this demo.
+          <p> * Immutable infrastructure  is key- setup and tear down is critical.
+          <p> * Sufficiently general and lightweight. Multi-cloud is critical.
+          <p> * Technologies are not the be all and end all. However, it is layered.
+          <p> * For example you can subsitute Terraform with Heat or Cloud Formation. Cloud Foundry with DEIS.
           </aside>
 				</section>
 
@@ -93,12 +103,16 @@
 					<img src="images/atx2016-arch.png">
 					<h2>Architecture</h2>
           <aside class="notes">
+          <p> * OpenStack set up via Terraform scripts
+          <p> * DEIS for stateless apps
+          <p> * Docker Swarm with a Swift backing store for stateful apps
+          <p> * Swift can be replaced by another distributed object store
           </aside>
 				</section>
 
 				<section data-background="images/slide_bg.png">
 					<h2>OpenStack</h2>
-          <p>BlueBox Cloud - Private Cloud as a Service
+          <h4>BlueBox Cloud - Private Cloud as a Service</h4>
 					<ul>
             <li>Keystone
 						<li>Nova
@@ -109,27 +123,29 @@
             <li>LBaaSv2
 					</ul>
           <aside class="notes">
-          <p>To ensure we had a good dynamic base we started with OpenStack
-          <p>working for BlueBox/IBM we of course used BlueBox Cloud
-          <p>We actively use Nova,Neutron,Swift,and LBaaS.
+          <p> * Started with OpenStack
+          <p> * working for BlueBox/IBM we of course used BlueBox Cloud
+          <p> * We actively use Nova,Neutron,Swift,and LBaaS.
           </aside>
 				</section>
 
 				<section data-background="images/slide_bg.png">
 					<h2>Terraform</h2>
-					<p>About terraform
-					<p>Why not Heat?
-					<p>Is it ready for prime time ?
+					<h4>About Terraform</h4>
+					<li> No vendor lock-in
+					<li> Multi-cloud
+					<li> Hybrid cloud (resources can be on multiple clouds)
           <aside class="notes">
-            <p>We needed to able to build/destroy our environments at will
-            <p>chose to use terraform as it is easier to GROK than heat
-            <p>We /could/ have done this with heat.
-            <p>Perfect for dev/test stuff don't care about.  Probably neither if or you are mature enough for prod.
+            <p> * We needed to able to build/destroy our environments at will.
+            <p> * Terraform comes from Hashicorp, the creators of Vagrant, Packer, consul, etc.
+            <p> * Terraform works for a variety of environments with no vendor lock in.
+            <p> * We /could/ have done this with heat but that would have been OpenStack specific.
+            <p>
           </aside>
 				</section>
 
         <section>
-          <h2>Terraform</h2>
+          <h2>Terraform Script</h2>
           <pre class="stretch"><code data-trim>
 resource "openstack_compute_instance_v2" "atx2016_swarm_primary" {
     name = "swarm-${var.cluster_name}-0"
@@ -153,9 +169,9 @@ resource "openstack_compute_instance_v2" "atx2016_swarm_primary" {
 }
           </code></pre>
           <aside class="notes">
-          * Example terraform resource.<br>
-          * describes swarm compute instance refers back to
-            network, secgroups, and other resources.
+          <p> * Example terraform resource.<br>
+          <p> * Describes swarm compute instance
+          <p> * Refers back to network, secgroups, and other resources.
           </aside>
         </section>
 
@@ -166,24 +182,35 @@ resource "openstack_compute_instance_v2" "atx2016_swarm_primary" {
           </video>
         </section>
 
+				</section>
+
 				<section data-background="images/slide_bg.png">
 					<h2>DEIS</h2>
-					<img src="images/deis-logo.png">
-					<a href="http://deis.io/overview/">http://deis.io/overview/</a>
+					<li> PaaS based around Docker and CoreOS
+					<li> Scale, Rollback, etc. easily
           <aside class="notes">
-          <p>I've worked with DEIS for quite some time and it's UX and Herokuesque workflow made it a no brainer.
-          <p>Heavy focus on stateless applications using external services (trove,RDS,etc) for data persistence.
+          <p> * DEIS has a Herokuesque workflow.
+          <p>* Heavy focus on stateless applications using external services (trove,RDS,etc) for data persistence.
+          </aside>
+				</section>
+
+				<section>
+					<img src="images/DeisGitPushWorkflow.png">
+					<a href="http://docs.deis.io/en/latest/_images/DeisGitPushWorkflow.png/">http://docs.deis.io/en/latest/_images/DeisGitPushWorkflow.png</a>
+          <aside class="notes">
+          <p> * Creation of a branch remotely starts off the deployment
+          <p> * Publish a "release" to the Docker registry
+          <p> * Route traffic to the new release
+          <p> * Rollback is very strtaightforward
           </aside>
 				</section>
 
 				<section>
 					<img src="images/deis-diagram.png">
-					<a href="http://docs.deis.io/en/latest/understanding_deis/architecture/">http://docs.deis.io/en/latest/understanding_deis/architecture/</a>
+					<a href="http://docs.deis.io/en/latest/_images/DeisGitPushWorkflow.png">http://docs.deis.io/en/latest/_images/DeisSystemDiagram.png</a>
           <aside class="notes">
-          <p>It is Docker based, currently runs on top of CoreOS+Fleet
-          <p>Moving to run on top of k8s in next major version.
-          <p>Relatively easy and quick to install and use, very easy to automate with Terraform.
-          <p>in prod you would run a postgres and ceph/s3
+          <p> * Three major components: Control plane, Data plane and Router mesh
+          <p> * You can scale each of them independently
           </aside>
 				</section>
 
@@ -193,10 +220,10 @@ resource "openstack_compute_instance_v2" "atx2016_swarm_primary" {
             <source data-src="videos/deis_demo.mp4" type="video/mp4" />
           </video>
           <aside class="notes">
-          <p>deis create; curl
-          <p>deis config:set POWERED_BY=openstack; curl
-          <p>deis rollback; curl
-          <p>deis logs
+          <p>* deis create; curl
+          <p> * deis config:set POWERED_BY=openstack; curl
+          <p> * deis rollback; curl
+          <p>* deis logs
           <p>
         </section>
 
@@ -205,11 +232,11 @@ resource "openstack_compute_instance_v2" "atx2016_swarm_primary" {
 				  <img src="images/docker-swarm.gif" height="30%" width="30%">
 					<br><a href="https://docs.docker.com/swarm/overview/">https://docs.docker.com/swarm/overview/</a>
           <aside class="notes">
-          <p>We knew some stuff wouldn't run well in PAAS due to state
-          <p>Swarm is easy to set up and run using Terraform
-          <p>Uses TLS for auth / encryption
-          <p>UX between docker and swarm is identical, K8s has steeper learning curve
-          <p>k8s too complicated for our simple needs here.
+          <p> * Stuff wouldn't run well in PAAS due to state
+          <p> * Swarm is easy to set up and run using Terraform
+          <p> * Uses TLS for auth / encryption
+          <p> * UX for docker and swarm is identical, K8s has steeper learning curve
+          <p> * k8s too complicated for our simple needs here.
           </aside>
 				</section>
 
@@ -223,9 +250,9 @@ resource "openstack_compute_instance_v2" "atx2016_swarm_primary" {
 				  <img src="images/docker-registry.png"><br>
 				  <a href="https://docs.docker.com/registry/">https://docs.docker.com/registry/</a>
           <aside class="notes">
-          <p>We run registry on each swarm node, only listens on localhost
-          <p>Backed by swift so our images persists and is available to all.
-          <p>We host our customized jenkins image and some other stuff in there.
+          <p>* We run registry on each swarm node, only listens on localhost
+          <p>* Backed by swift so our images persists and is available to all.
+          <p>* We host our customized jenkins image and some other stuff in there.
           </aside>
 				</section>
 
@@ -235,9 +262,9 @@ resource "openstack_compute_instance_v2" "atx2016_swarm_primary" {
 					<br><a href="https://jenkins.io/">https://jenkins.io/</a>
 
           <aside class="notes">
-          <p>Didn't want to use jenkins, but only CI tool we could find that could do action on PR close.
-          <p>Used official jenkins image, added deis binaries and keys and stuff, saved off with docker commit.
-          <p>stored in docker registry (swift)
+          <p> * Jenkins was only CI tool we could find that could do action on PR close.
+          <p> * Used official jenkins image, added deis binaries and keys and stuff, saved off with docker commit.
+          <p>* stored in docker registry (swift)
           </aside>
 				</section>
 
@@ -245,12 +272,12 @@ resource "openstack_compute_instance_v2" "atx2016_swarm_primary" {
         <p>Development Workflow
         <img class="stretch" src="images/Workflow.png">
           <aside class="notes">
-          <p>Dev writes code in feature branch, pushs to branch, creates PR
-          <p>GH notifies jenkins, runs tests, deploys PR specific dev environment
-          <p>Reviewer reviews and merges PR to Develop branch, GH notifies J
-          <p>Jenkins destroys dev environment, deploys changes to staging
-          <p>Release manager reviews and merges Develop to Master, GH notifies J
-          <p>Jenkins deploys changes to production
+          <p>* Dev writes code in feature branch, pushs to branch, creates PR
+          <p>* GH notifies jenkins, runs tests, deploys PR specific dev environment
+          <p>* Reviewer reviews and merges PR to Develop branch, GH notifies J
+          <p>* Jenkins destroys dev environment, deploys changes to staging
+          <p>* Release manager reviews and merges Develop to Master, GH notifies J
+          <p>* Jenkins deploys changes to production
           </aside>
 				</section>
 
@@ -268,10 +295,10 @@ ENTRYPOINT ["/usr/sbin/caddy", "-conf", "/demo/presentation/caddyfile", "-root",
 EXPOSE 8080
           </code></pre>
           <aside class="notes">
-          <p>eating our own dogfood.  developed this pres using this workflow
-          <p>presentation is simple HTML using reveal.js
-          <p>uses caddy a simple GO based web server to serve presentation
-          <p>jenkins tests are a noop due to simple nature of html, should be lint/unit tests
+          <p>* eating our own dogfood.  developed this pres using this workflow
+          <p>* presentation is simple HTML using reveal.js
+          <p>* uses caddy a simple GO based web server to serve presentation
+          <p>j* enkins tests are a noop due to simple nature of html, should be lint/unit tests
           </aside>
         </section>
 
@@ -290,13 +317,13 @@ EXPOSE 8080
 				<li><a href="https://github.com/atx2016/openstack-summit-austin-2016">This Presentation (and code for demo)</a>
 				</ul>
         <aside class="notes">
-        <p>orig article on sysadvent, ghost blog with database.
-        <p>Terraform for swarm,registry,deis,others
+        <p>* orig article on sysadvent, ghost blog with database.
+        <p>* Terraform for openstack, swarm,registry,deis,others
         </aside>
 				</section>
 
 				<section data-background="images/slide_bg.png">
-				<h2>Finish</h2>
+				<h2>Thank You!</h2>
 				<img src="images/finish.jpg">
 				<h3>Questions?</h3>
           <aside class="notes">
