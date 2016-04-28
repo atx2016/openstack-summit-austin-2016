@@ -145,16 +145,14 @@
 				</section>
 
         <section>
-          <h2>Terraform Script</h2>
+          <h2>Terraform Config File</h2>
           <pre class="stretch"><code data-trim>
 resource "openstack_compute_instance_v2" "atx2016_swarm_primary" {
     name = "swarm-${var.cluster_name}-0"
     image_name = "${var.image_name}"
     flavor_name = "${var.flavor}"
     key_pair = "${openstack_compute_keypair_v2.atx2016.name}"
-    network {
-        name = "${openstack_networking_network_v2.atx2016.name}"
-    }
+    network { name = "${openstack_networking_network_v2.atx2016.name}" }
     security_groups = [
         "${openstack_compute_secgroup_v2.atx2016_swarm.name}",
         "${openstack_compute_secgroup_v2.atx2016.name}"
@@ -168,6 +166,7 @@ resource "openstack_compute_instance_v2" "atx2016_swarm_primary" {
     ]
 }
           </code></pre>
+          <p><small><a href="https://github.com/atx2016/openstack-summit-austin-2016/blob/develop/terraform/swarm.tf">https://github.com/atx2016/openstack-summit-austin-2016/blob/develop/terraform/swarm.tf</a></small>
           <aside class="notes">
           <p> * Example terraform resource.<br>
           <p> * Describes swarm compute instance
@@ -185,9 +184,12 @@ resource "openstack_compute_instance_v2" "atx2016_swarm_primary" {
 				</section>
 
 				<section data-background="images/slide_bg.png">
-					<h2>DEIS</h2>
-					<li> PaaS based around Docker and CoreOS
+          <h2>DEIS</h2>
+					<img src="images/deis-logo.png"><br>
+          <ul>
+					<li> PaaS built on top of Docker and CoreOS
 					<li> Scale, Rollback, etc. easily
+          </ul>
           <aside class="notes">
           <p> * DEIS has a Herokuesque workflow.
           <p>* Heavy focus on stateless applications using external services (trove,RDS,etc) for data persistence.
@@ -195,24 +197,24 @@ resource "openstack_compute_instance_v2" "atx2016_swarm_primary" {
 				</section>
 
 				<section>
-					<img src="images/DeisGitPushWorkflow.png">
-					<a href="http://docs.deis.io/en/latest/_images/DeisGitPushWorkflow.png/">http://docs.deis.io/en/latest/_images/DeisGitPushWorkflow.png</a>
+					<img src="images/deis-diagram.png">
+					<small><a href="http://docs.deis.io/en/latest/_images/DeisSystemDiagram.png">http://docs.deis.io/en/latest/_images/DeisSystemDiagram.png</a></small>
+          <aside class="notes">
+          <p> * Three major components: Control plane, Data plane and Router mesh
+          <p> * You can scale each of them independently
+          </aside>
+				</section>
+
+        <section>
+          <img src="images/DeisGitPushWorkflow.png">
+          <small><a href="http://docs.deis.io/en/latest/_images/DeisGitPushWorkflow.png/">http://docs.deis.io/en/latest/_images/DeisGitPushWorkflow.png</a></small>
           <aside class="notes">
           <p> * Creation of a branch remotely starts off the deployment
           <p> * Publish a "release" to the Docker registry
           <p> * Route traffic to the new release
           <p> * Rollback is very strtaightforward
           </aside>
-				</section>
-
-				<section>
-					<img src="images/deis-diagram.png">
-					<a href="http://docs.deis.io/en/latest/_images/DeisGitPushWorkflow.png">http://docs.deis.io/en/latest/_images/DeisSystemDiagram.png</a>
-          <aside class="notes">
-          <p> * Three major components: Control plane, Data plane and Router mesh
-          <p> * You can scale each of them independently
-          </aside>
-				</section>
+        </section>
 
         <section>
           <h2>DEIS Demo</h2>
@@ -232,10 +234,11 @@ resource "openstack_compute_instance_v2" "atx2016_swarm_primary" {
 				  <img src="images/docker-swarm.gif" height="30%" width="30%">
 					<br><a href="https://docs.docker.com/swarm/overview/">https://docs.docker.com/swarm/overview/</a>
           <aside class="notes">
-          <p> * Stuff wouldn't run well in PAAS due to state
+          <p> * multi-server container orchestration.
+          <p> * UX for docker and swarm is identical
+          <p> * Stuff wouldn't run well in PAAS due to state ( jenkins, registry)
           <p> * Swarm is easy to set up and run using Terraform
-          <p> * Uses TLS for auth / encryption
-          <p> * UX for docker and swarm is identical, K8s has steeper learning curve
+          <p> * Uses TLS for access authorization / encryption
           <p> * k8s too complicated for our simple needs here.
           </aside>
 				</section>
@@ -243,6 +246,13 @@ resource "openstack_compute_instance_v2" "atx2016_swarm_primary" {
 				<section data-background="images/slide_bg.png">
 				<h2>Docker Swarm</h2>
 				<img src="images/dockerswarm-arch.png">
+          <aside class="notes">
+          <p> * for HA use a load balancer in front of docker swarm manager
+          <p> * each node runs Docker and a Docker Swarm Agent
+          <p> * Agent checks health of local Docker and registers it with etcd
+          <p> * Swarm Manager runs on one or more of the nodes, reads ETCD and
+                uses data from swarm agent to make scheduling decisions.
+          </aside>
 				</section>
 
 				<section data-background="images/slide_bg.png">
@@ -263,23 +273,33 @@ resource "openstack_compute_instance_v2" "atx2016_swarm_primary" {
 
           <aside class="notes">
           <p> * Jenkins was only CI tool we could find that could do action on PR close.
-          <p> * Used official jenkins image, added deis binaries and keys and stuff, saved off with docker commit.
-          <p>* stored in docker registry (swift)
+          <p> * Used official jenkins image, added deis binaries and keys and stuff
+          <p> * installed jenkins plugins GHPRB, oauth, a few others
+          <p> * saved off with docker commit and stored in docker registry (swift)
           </aside>
 				</section>
 
-				<section>
-        <p>Development Workflow
-        <img class="stretch" src="images/Workflow.png">
+        <section>
+          <h2>Jenkins Job - Deploy Dev Environment</h2>
+          <pre class="stretch"><code data-trim>
+#!/bin/bash
+
+APP="dev-${ghprbPullId}"
+
+git checkout ${ghprbSourceBranch}
+
+deis create ${APP} || \
+  git remote add deis ssh://git@deis.atx2016.paulcz.net:2222/${APP}.git
+
+git push -f deis ${ghprbSourceBranch} | tee deis_deploy.txt
+          </code></pre>
           <aside class="notes">
-          <p>* Dev writes code in feature branch, pushs to branch, creates PR
-          <p>* GH notifies jenkins, runs tests, deploys PR specific dev environment
-          <p>* Reviewer reviews and merges PR to Develop branch, GH notifies J
-          <p>* Jenkins destroys dev environment, deploys changes to staging
-          <p>* Release manager reviews and merges Develop to Master, GH notifies J
-          <p>* Jenkins deploys changes to production
+          <p>* use the PR number to name our application
+          <p>* deis uses wildcard DNS, this gives us a predictable name/url
+          <p>* deis create, if fails assume already exists and just add the git remote
+          <p>* run git push to deis remote to kick off deis build/deploy
           </aside>
-				</section>
+        </section>
 
         <section>
           <h2>Our Application</h2>
@@ -301,6 +321,19 @@ EXPOSE 8080
           <p>j* enkins tests are a noop due to simple nature of html, should be lint/unit tests
           </aside>
         </section>
+
+				<section>
+        <p>Development Workflow
+        <img class="stretch" src="images/Workflow.png">
+          <aside class="notes">
+          <p>* Dev writes code in feature branch, pushs to branch, creates PR
+          <p>* GH notifies jenkins, runs tests, deploys PR specific dev environment
+          <p>* Reviewer reviews and merges PR to Develop branch, GH notifies J
+          <p>* Jenkins destroys dev environment, deploys changes to staging
+          <p>* Release manager reviews and merges Develop to Master, GH notifies J
+          <p>* Jenkins deploys changes to production
+          </aside>
+				</section>
 
         <section>
           <h2>Workflow Demo</h2>
