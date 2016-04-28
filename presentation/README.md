@@ -1,7 +1,7 @@
 Docker, Docker, Docker, Openstack
 =================================
 
-Paul Czarkowski's presentation for Openstack Vancouver summit.
+Paul Czarkowski and Rags' presentation for Openstack Austin summit.
 
 Viewing the slides
 ------------------
